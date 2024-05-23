@@ -19,8 +19,7 @@ using namespace std;
 #include <string>
 
 int gstate = 1;
-string mstate = "STOP";
-
+string mstate = "GATE";
 
 string left(){	return "LEFT";}
 
@@ -204,7 +203,7 @@ bool changeP(){
 		}
 	}
 	if(rcount > 50){
-		gstate++;
+		return true;
 		motP2.fwd();
 	}
 }
@@ -326,24 +325,23 @@ string intersect(){
 
 
 int main(){
-	
-    init(0);
-    open_screen_stream();
+	init(0);
+	open_screen_stream();
     take_picture();
     sleep1(100);
     bool stop = false;
     motor mot;
     camera cam;
-    colours colour;
     motor::MP1 motP1;
     motor::MP2 motP2;
-    camera::CP2 camP2; 
-    //double M;
+    camera::CP2 camP2;
 
-	motor mot;
-    double M = cam.camP1();
+	while(true){
+        take_picture();
 
-        if (gstate ==1){
+        double M = cam.camP1();
+
+        if (gstate == 1){
             gate();
             motP1.adjust(M);
         }
@@ -353,7 +351,7 @@ int main(){
             motP1.adjust(M);
         }
 
-        /*if(gstate == THREE){
+        /*if(gstate == 3){
            // adjust camera to look up
         }*/
         
@@ -371,7 +369,10 @@ int main(){
         - get close to pillars without touching
         - look up, find red ball, push off
     */
-        cam.changeP();
+        if (cam.changeP()){
+			gstate++;
+		}
+		
         update_screen();
         if (stop == true){ // STOP MOTOR
             set_motors(5,48);
@@ -379,8 +380,7 @@ int main(){
             hardware_exchange();
             
         }
-		 close_screen_stream();
     }
-   
-
+	close_screen_stream();
+	}
 
